@@ -10,6 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UrlShorteningService.Manager.Services;
+using UrlShorteningService.Manager.Services.Abstractions;
+using UrlShorteningService.Repository;
+using UrlShorteningService.Repository.Repositories;
+using UrlShorteningService.Repository.Repositories.Abstractions;
 
 namespace UrlShorteningService.Api
 {
@@ -18,6 +23,10 @@ namespace UrlShorteningService.Api
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            using (var context = new ShortenedUrlContext())
+            {
+                context.Database.EnsureCreated();
+            }
         }
 
         public IConfiguration Configuration { get; }
@@ -31,6 +40,9 @@ namespace UrlShorteningService.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "UrlShorteningService.Api", Version = "v1" });
             });
+            services.AddScoped<IShortUrlService, ShortUrlService>();
+            services.AddScoped<IAlphanumericService, AlphanumericService>();
+            services.AddScoped<IShortenedUrlRepository, ShortenedUrlRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
